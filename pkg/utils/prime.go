@@ -8,7 +8,7 @@ const (
 	defaultTestTime = 10
 )
 
-var IncrementalSize = big.NewInt(1)
+var incrementalSize = big.NewInt(1)
 
 // NextPrime 返回 >= num 的第一个素数
 func NextPrime(num *big.Int) *big.Int {
@@ -19,7 +19,7 @@ func NextPrime(num *big.Int) *big.Int {
 	result := (&big.Int{}).Set(num)
 
 	for !result.ProbablyPrime(defaultTestTime) {
-		result.Add(result, IncrementalSize)
+		result.Add(result, incrementalSize)
 	}
 
 	return result
