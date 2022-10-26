@@ -17,20 +17,17 @@ func InvMod(a, n int64) int64 {
 }
 
 func XGCD(a, b int64) (int64, int64) {
-	var aNeg int64 = 1
+	if a < -math.MaxInt64 || b < -math.MaxInt64 {
+		panic(any("XGCD: integer overflow"))
+	}
 
+	var aNeg int64 = 1
 	if a < 0 {
-		if a < -math.MaxInt64 {
-			panic(any("XGCD: integer overflow"))
-		}
 		a = -a
 		aNeg = -1
 	}
 
 	if b < 0 {
-		if b < -math.MaxInt64 {
-			panic(any("XGCD: integer overflow"))
-		}
 		b = -b
 	}
 
