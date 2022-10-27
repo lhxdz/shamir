@@ -16,11 +16,11 @@ func Decrypt(keys []Key, prime *big.Int) *big.Int {
 		result = result.Add(result, tmp)
 		result = result.Mod(result, prime)
 	}
-	return nil
+	return result
 }
 
 func getXKeysExceptI(keys []Key, i int) []*big.Int {
-	xKeys := make([]*big.Int, len(keys)-1)
+	xKeys := make([]*big.Int, 0, len(keys)-1)
 	for j, key := range keys {
 		if j == i {
 			continue

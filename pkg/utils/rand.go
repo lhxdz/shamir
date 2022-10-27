@@ -28,7 +28,7 @@ func (r *randGenerator) randInt() (*big.Int, error) {
 }
 
 func (r *randGenerator) randIntList(num int) ([]*big.Int, error) {
-	result := make([]*big.Int, num)
+	result := make([]*big.Int, 0, num)
 	for i := 0; i < num; i++ {
 		random, err := r.randInt()
 		if err != nil {
