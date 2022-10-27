@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	math2 "shamir/pkg/utils/math"
 )
 
-var minPrime = NextPrime(big.NewInt(math.MaxInt64))
+var minPrime = math2.NextPrime(big.NewInt(math.MaxInt64))
 
 func Encrypt(secret *big.Int, threshold, keysNumber int) (keys []Key, prime *big.Int, err error) {
 	if threshold > keysNumber {
@@ -20,19 +21,19 @@ func Encrypt(secret *big.Int, threshold, keysNumber int) (keys []Key, prime *big
 		// 若秘密太小，则使用默认质数
 		prime = new(big.Int).Set(minPrime)
 	} else {
-		prime = NextPrime(secret)
+		prime = math2.NextPrime(secret)
 	}
 
 	coefficients := make([]*big.Int, 0, threshold)
 	// secret作为系数a0
 	coefficients = append(coefficients, secret)
-	tmpCoefficients, err := newRandGenerator(prime).randIntList(threshold - 1)
+	tmpCoefficients, err := math2.NewRandGenerator(prime).RandIntList(threshold - 1)
 	if err != nil {
 		return nil, nil, err
 	}
 	coefficients = append(coefficients, tmpCoefficients...)
 
-	xKeys, err := newRandGenerator(minPrime).randIntList(keysNumber)
+	xKeys, err := math2.NewRandGenerator(minPrime).RandIntList(keysNumber)
 	if err != nil {
 		return nil, nil, err
 	}
