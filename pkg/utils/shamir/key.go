@@ -1,4 +1,4 @@
-package utils
+package shamir
 
 import "math/big"
 

@@ -1,4 +1,4 @@
-package utils
+package shamir
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 
 var minPrime = math2.NextPrime(big.NewInt(math.MaxInt64))
 
+// Encrypt shamir加密算法，输入秘密secret，门限值threshold，密钥个数keysNumber
+// 返回加密结果密钥对keys，和加密使用的素数，都需谨慎保存
 func Encrypt(secret *big.Int, threshold, keysNumber int) (keys []Key, prime *big.Int, err error) {
 	if threshold > keysNumber {
 		return nil, nil, fmt.Errorf("threshold(%d) can not bigger than keys number(%d)", threshold, keysNumber)
