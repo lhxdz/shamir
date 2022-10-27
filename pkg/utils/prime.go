@@ -16,7 +16,7 @@ func NextPrime(num *big.Int) *big.Int {
 		return big.NewInt(2)
 	}
 
-	result := (&big.Int{}).Set(num)
+	result := new(big.Int).Set(num)
 
 	for !result.ProbablyPrime(defaultTestTime) {
 		result.Add(result, incrementalSize)

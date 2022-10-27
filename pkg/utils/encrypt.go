@@ -23,7 +23,7 @@ func Encrypt(secret *big.Int, threshold, keysNumber int) (keys []Key, prime *big
 		prime = NextPrime(secret)
 	}
 
-	coefficients := make([]*big.Int, threshold)
+	coefficients := make([]*big.Int, 0, threshold)
 	// secret作为系数a0
 	coefficients = append(coefficients, secret)
 	tmpCoefficients, err := newRandGenerator(prime).randIntList(threshold - 1)
@@ -33,7 +33,11 @@ func Encrypt(secret *big.Int, threshold, keysNumber int) (keys []Key, prime *big
 	coefficients = append(coefficients, tmpCoefficients...)
 
 	xKeys, err := newRandGenerator(minPrime).randIntList(keysNumber)
-	keys = make([]Key, keysNumber)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	keys = make([]Key, 0, keysNumber)
 	for _, xKey := range xKeys {
 		yKey := compute(coefficients, prime, xKey)
 		keys = append(keys, Key{X: new(big.Int).Set(xKey), Y: yKey})
