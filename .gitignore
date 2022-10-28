@@ -16,3 +16,4 @@
 
 go.sum
 /bin
+coverage.out
