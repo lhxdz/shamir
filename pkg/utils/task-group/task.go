@@ -1,7 +1,7 @@
 package taskgroup
 
 import (
-	"fmt"
+	"shamir/pkg/utils/log"
 	"sync/atomic"
 )
 
@@ -37,12 +37,12 @@ func newTask(t Task) *task {
 
 func (t *task) Start() {
 	if Status(t.status.Load()) == Running {
-		fmt.Printf("task(%q) is running\n", t.Name())
+		log.Warnf("task(%q) is running", t.Name())
 		return
 	}
 	t.err = t.Task.Start()
 	if t.Error() != nil {
-		fmt.Printf("task(%q) start failed: %v\n", t.Name(), t.Error())
+		log.Errorf("task%q start failed: %v", t.Name(), t.Error())
 	}
 	t.status.Store(int32(Stopped))
 	return
@@ -50,7 +50,7 @@ func (t *task) Start() {
 
 func (t *task) Stop() {
 	if Status(t.status.Load()) != Running {
-		fmt.Printf("task(%q) is not running\n", t.Name())
+		log.Warnf("task(%q) is not running", t.Name())
 		return
 	}
 
