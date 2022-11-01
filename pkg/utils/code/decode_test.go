@@ -27,3 +27,12 @@ func TestKeyEncodeDecode(t *testing.T) {
 	result := DecodeKey(encodeInt)
 	assert.Equal(t, key, result)
 }
+
+func TestKeyEncodeDecodeKeys(t *testing.T) {
+	key := "ThisIsABigNumber1_ThisIsABigNumber2"
+	encodeIntegers, ok := EncodeKeys(key)
+	require.True(t, ok, "encode key to keys failed")
+	require.Equal(t, 2, len(encodeIntegers))
+	result := DecodeKeys(encodeIntegers)
+	assert.Equal(t, key, result)
+}
