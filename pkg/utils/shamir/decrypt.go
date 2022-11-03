@@ -31,13 +31,17 @@ func getXKeysExceptI(keys []Key, i int) []*big.Int {
 	return xKeys
 }
 
-// 求(xKeys[0]*...xKeys[n]) / ((xKeysI - xKeys[0])*...(xKeysI - xKeys[n])) mod prime
+// 求((-xKeys[0])*...(-xKeys[n])) / ((xKeysI - xKeys[0])*...(xKeysI - xKeys[n])) mod prime
 // 其中 n = (len(xKeys)-1)
 // 其中的xKey不能为0
 // prime为0会panic
 // 若其中xKeys某一项和xKeysI值相等，则会panic
 func product(xKeys []*big.Int, xKeysI *big.Int, prime *big.Int) *big.Int {
 	result := big.NewInt(1)
+	if len(xKeys)%2 != 0 {
+		// 奇数个负数分子相乘为奇数
+		result = big.NewInt(-1)
+	}
 	for _, key := range xKeys {
 		result = result.Mul(result, key)
 		result = result.Mod(result, prime)
