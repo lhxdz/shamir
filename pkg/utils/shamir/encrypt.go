@@ -43,7 +43,7 @@ func Encrypt(secret *big.Int, threshold, keysNumber int, fast bool) (keys []Key,
 	}
 	coefficients = append(coefficients, tmpCoefficients...)
 
-	xKeys, err := math2.NewRandGenerator(minInt(minPrime, prime)).RandIntList(keysNumber)
+	xKeys, err := math2.NewRandGenerator(minInt(minPrime, prime)).RandIntListNoRepeat(keysNumber)
 	if err != nil {
 		return nil, nil, err
 	}
