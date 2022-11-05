@@ -3,6 +3,7 @@ package secure
 import (
 	"os"
 	"path/filepath"
+
 	"shamir/pkg/utils/log"
 )
 

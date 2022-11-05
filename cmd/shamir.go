@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+
 	cmd2 "shamir/pkg/cmd"
 	"shamir/pkg/utils/log"
 )
