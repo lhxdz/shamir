@@ -4,15 +4,20 @@ import (
 	"fmt"
 	"os"
 
-	cmd2 "shamir/pkg/cmd"
+	"shamir/pkg/cmd"
 	"shamir/pkg/utils/log"
 )
 
 func main() {
-	cmd := cmd2.NewCommand()
-	err := cmd.Execute()
+	command, err := cmd.NewCommand()
+	handleError(err)
+	err = command.Execute()
+	handleError(err)
+}
+
+func handleError(err error) {
 	if err != nil {
-		log.Error("run command failed:%v", err)
+		log.Error(err)
 		fmt.Println(err)
 		os.Exit(1)
 	}

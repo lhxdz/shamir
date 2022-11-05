@@ -17,12 +17,17 @@ func ValidateFileSize(file string, size int64) bool {
 	stat, err := os.Stat(newPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return true
+			return false
 		}
 
 		log.Errorf("get file %q	stat failed: %v", file, err)
 		return false
 	}
 
-	return stat.Size() <= size
+	if stat.Size() > size {
+		log.Errorf("Error: file%q size more than %d", newPath, size)
+		return false
+	}
+
+	return true
 }

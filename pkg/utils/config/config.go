@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -23,25 +22,31 @@ const (
 
 var configPath = []string{"/var/lib/shamir", "/usr/lib/shamir"}
 
+// InitConfig 当传入参数fast==true时，将使用默认的config
 func InitConfig(fast bool) error {
+	defer SetDefault()
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix(envPrefix)
 	if fast {
 		return nil
 	}
 
-	viper.SetEnvPrefix(envPrefix)
 	viper.SetConfigName(configFileName)
+	viper.SetConfigType(defaultConfigType)
 	for _, path := range configPath {
 		if !secure.ValidateFileSize(filepath.Join(path, configFileName), maxConfigFileSize) {
-			fmt.Printf("Error: file%q size more than %dM", filepath.Join(path, configFileName), maxConfigFileSize/unitM)
 			continue
 		}
+
 		viper.AddConfigPath(path)
 	}
-	viper.SetConfigType(defaultConfigType)
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		return err
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			// 配置文件未找到错误，暂时忽略
+			return err
+		}
 	}
 
 	return nil
