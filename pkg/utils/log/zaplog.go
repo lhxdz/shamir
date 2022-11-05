@@ -1,11 +1,12 @@
 package log
 
 import (
+	"os"
+	"strings"
+
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
-	"strings"
 )
 
 const (

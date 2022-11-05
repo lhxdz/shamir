@@ -1,8 +1,9 @@
 package taskgroup
 
 import (
-	"shamir/pkg/utils/log"
 	"sync/atomic"
+
+	"shamir/pkg/utils/log"
 )
 
 type Status int32

@@ -1,8 +1,9 @@
 package taskgroup
 
 import (
-	"shamir/pkg/utils/log"
 	"sync"
+
+	"shamir/pkg/utils/log"
 )
 
 type TaskGroup struct {
