@@ -1,1 +1,3 @@
 # this is a config about shamir tools
+log:
+  path: /var/log/shamir/shamir.log

@@ -51,6 +51,10 @@ func WithLogLever(level Level) Option {
 // WithLogPath 输出到文件，可与 WithConsole 同时使用
 func WithLogPath(path string) Option {
 	return func(conf *logConfig) {
+		if path == "" {
+			return
+		}
+
 		conf.lumberjackConf.Filename = path
 		if conf.logWriter == console {
 			conf.logWriter = both
