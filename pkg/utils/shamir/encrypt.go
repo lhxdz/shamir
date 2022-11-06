@@ -5,23 +5,24 @@ import (
 	"math"
 	"math/big"
 
+	"shamir/pkg/utils/code"
 	math2 "shamir/pkg/utils/math"
 )
 
 const (
-	minThreshold = 2
+	MinThreshold = 2
 )
 
 var minPrime = math2.NextPrime(big.NewInt(math.MaxInt64))
 
 // Encrypt shamir加密算法，输入秘密secret，门限值threshold，密钥个数keysNumber
 // 返回加密结果密钥对keys，和加密使用的素数，都需谨慎保存
-func Encrypt(secret *big.Int, threshold, keysNumber int, fast bool) (keys []Key, prime *big.Int, err error) {
+func Encrypt(secret *big.Int, threshold, keysNumber int, fast bool) (keys []code.Key, prime *big.Int, err error) {
 	if threshold > keysNumber {
 		return nil, nil, fmt.Errorf("threshold(%d) can not bigger than keys number(%d)", threshold, keysNumber)
 	}
-	if threshold < minThreshold {
-		return nil, nil, fmt.Errorf("threshold(%d) can not smaller than %d", threshold, minThreshold)
+	if threshold < MinThreshold {
+		return nil, nil, fmt.Errorf("threshold(%d) can not smaller than %d", threshold, MinThreshold)
 	}
 
 	if minPrime.Cmp(secret) > 0 {
@@ -49,10 +50,10 @@ func Encrypt(secret *big.Int, threshold, keysNumber int, fast bool) (keys []Key,
 		return nil, nil, err
 	}
 
-	keys = make([]Key, 0, keysNumber)
+	keys = make([]code.Key, 0, keysNumber)
 	for _, xKey := range xKeys {
 		yKey := compute(coefficients, prime, xKey)
-		keys = append(keys, Key{X: xKey, Y: yKey})
+		keys = append(keys, code.Key{X: xKey, Y: yKey})
 	}
 
 	return

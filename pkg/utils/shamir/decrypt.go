@@ -1,6 +1,10 @@
 package shamir
 
-import "math/big"
+import (
+	"math/big"
+
+	"shamir/pkg/utils/code"
+)
 
 const (
 	negative = -1
@@ -8,7 +12,7 @@ const (
 
 // Decrypt 根据密钥对解密，传入 len(keys) 必须是门限值threshold, prime 也必须是加密时使用的素数。
 // keys要求不能有重复元素，否则panic
-func Decrypt(keys []Key, prime *big.Int) *big.Int {
+func Decrypt(keys []code.Key, prime *big.Int) *big.Int {
 	result := big.NewInt(0)
 	for i, key := range keys {
 		tmp := product(getXKeysExceptI(keys, i), key.X, prime)
@@ -19,7 +23,7 @@ func Decrypt(keys []Key, prime *big.Int) *big.Int {
 	return result
 }
 
-func getXKeysExceptI(keys []Key, i int) []*big.Int {
+func getXKeysExceptI(keys []code.Key, i int) []*big.Int {
 	xKeys := make([]*big.Int, 0, len(keys)-1)
 	for j, key := range keys {
 		if j == i {
