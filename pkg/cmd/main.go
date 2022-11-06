@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -19,49 +18,58 @@ type MainCmdConf struct {
 	logLevel string
 }
 
-func NewCommand() (*cobra.Command, error) {
-	err := config.InitConfig(false)
-	if err != nil {
-		return nil, fmt.Errorf("init config failed: %w", err)
-	}
-
+func NewMainCommand() (*cobra.Command, error) {
 	cmd := &cobra.Command{}
-	ctx := &MainCmdConf{}
+	conf := &MainCmdConf{}
 	cmd.Use = "shamir"
 	cmd.Short = "Command line for Shamir"
 	cmd.Long =
 		`Command line for Shamir
 
-"Shamir“ be used for (k, n) encrypt. You can use it to encrypt a string or a file.
+"Shamir" be used for (t, n) encrypt. You can use it to encrypt a string or a file.
 It will be encrypted as n keys which contains (x, y) and one necessary key.
-Any k keys can restore the secret.
+Any t keys can restore the secret.
 For help with any of those, simply call them with --help.`
 	cmd.SilenceUsage = true
 	cmd.SilenceErrors = true
 	cmd.CompletionOptions = cobra.CompletionOptions{DisableDefaultCmd: true}
 
 	// 设置全局flag
-	cmd.PersistentFlags().BoolVarP(&ctx.console, "console", "c", false, "Print log use console, default (false). "+
+	cmd.PersistentFlags().BoolVarP(&conf.console, "console", "c", false, "Print log use console, default (false). "+
 		"Can use --both-log and --log print log both to file and console. When use both -c and --log without --both-log, it will only work -c")
-	cmd.PersistentFlags().StringVar(&ctx.logPath, "log", "", "Print log to log file with path, default empty. "+
+	cmd.PersistentFlags().StringVar(&conf.logPath, "log", "", "Print log to log file with path, default empty. "+
 		"Can use --both-log and -c print log both to file and console")
-	cmd.PersistentFlags().BoolVar(&ctx.bothLog, "both-log", false, "Print log both console and file, default (false)")
-	cmd.PersistentFlags().StringVarP(&ctx.logLevel, "level", "l", "info", "Print log with log level, default (info). "+
+	cmd.PersistentFlags().BoolVar(&conf.bothLog, "both-log", false, "Print log both console and file, default (false)")
+	cmd.PersistentFlags().StringVarP(&conf.logLevel, "level", "l", "info", "Print log with log level, default (info). "+
 		"[debug|info|warn|error|dpanic|panic]")
+
+	cmd.Args = cobra.NoArgs
+	cmd.PersistentPreRunE = conf.PreRun
 
 	cmd.SetVersionTemplate("{{.Version}}\n")
 	cmd.Version = version.Version
 
-	// 解析参数、初始化配置
-	err = cmd.ParseFlags(os.Args[1:])
-	if err != nil {
-		return nil, err
-	}
-	ctx.init()
+	// encrypt command
+	cmd.AddCommand(NewEncryptCommand())
+
+	cmd.InitDefaultHelpCmd()
+	cmd.InitDefaultHelpFlag()
+	cmd.InitDefaultVersionFlag()
+
 	return cmd, nil
 }
 
-func (m *MainCmdConf) init() {
+func (m *MainCmdConf) PreRun(_ *cobra.Command, _ []string) error {
+	err := config.InitConfig(false)
+	if err != nil {
+		return fmt.Errorf("init config failed: %w", err)
+	}
+
+	m.initLog()
+	return nil
+}
+
+func (m *MainCmdConf) initLog() {
 	opts := []log.Option{
 		log.WithLogLever(log.Level(m.logLevel)),
 		log.WithMaxSize(viper.GetInt(config.LogMaxSize)),

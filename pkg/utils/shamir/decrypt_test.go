@@ -6,13 +6,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+
+	"shamir/pkg/utils/code"
 )
 
 type decryptEncryptSuit struct {
 	suite.Suite
 
 	secret                *big.Int
-	keys                  []Key
+	keys                  []code.Key
 	threshold, keysNumber int
 	prime                 *big.Int
 }

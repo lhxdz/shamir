@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	command, err := cmd.NewCommand()
+	command, err := cmd.NewMainCommand()
 	handleError(err)
 	err = command.Execute()
 	handleError(err)
