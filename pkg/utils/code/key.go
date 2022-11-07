@@ -1,6 +1,7 @@
 package code
 
 import (
+	"fmt"
 	"math/big"
 )
 
@@ -31,4 +32,20 @@ func EncodeAbleKeys(keys []Key) []*StrKey {
 		})
 	}
 	return result
+}
+
+func EncodeStrKeys(keys []*StrKey) ([]Key, error) {
+	result := make([]Key, 0, len(keys))
+	for _, key := range keys {
+		xKey, ok := EncodeKey(key.X)
+		if !ok {
+			return nil, fmt.Errorf("invalid x key: %s", key.X)
+		}
+		yKey, ok := EncodeKey(key.Y)
+		if !ok {
+			return nil, fmt.Errorf("invalid y key: %s", key.Y)
+		}
+		result = append(result, Key{X: xKey, Y: yKey})
+	}
+	return result, nil
 }

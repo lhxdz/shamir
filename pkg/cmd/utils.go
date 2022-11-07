@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
 
@@ -56,4 +57,23 @@ func RenderData(format string, header []string, data [][]string, raw any, writer
 	}
 
 	return nil
+}
+
+func NoArgs(cmd *cobra.Command, args []string) error {
+	if err := cobra.NoArgs(cmd, args); err != nil {
+		_ = cmd.Usage()
+		return err
+	}
+
+	return nil
+}
+
+func ExactArgs(n int) cobra.PositionalArgs {
+	return func(cmd *cobra.Command, args []string) error {
+		if err := cobra.ExactArgs(n)(cmd, args); err != nil {
+			_ = cmd.Usage()
+			return err
+		}
+		return nil
+	}
 }

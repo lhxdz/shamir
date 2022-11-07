@@ -52,6 +52,9 @@ For help with any of those, simply call them with --help.`
 	// encrypt command
 	cmd.AddCommand(NewEncryptCommand())
 
+	// decrypt command
+	cmd.AddCommand(NewDecryptCommand())
+
 	cmd.InitDefaultHelpCmd()
 	cmd.InitDefaultHelpFlag()
 	cmd.InitDefaultVersionFlag()
