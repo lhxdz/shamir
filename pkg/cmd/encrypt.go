@@ -33,7 +33,7 @@ func NewEncryptCommand() *cobra.Command {
 You can use it to encrypt a string or a file.
 It will be encrypted as n keys which contains (x, y) and one necessary key.
 Any t keys can restore the secret.`
-	cmd.Args = cobra.ExactArgs(1)
+	cmd.Args = ExactArgs(1)
 	// 设置全局flag
 	cmd.Flags().BoolVarP(&conf.fast, "fast", "f", true, "Use exist prime to encrypt secret")
 	cmd.Flags().StringVarP(&conf.output, "output", "o", "", "Output the keys to file")
