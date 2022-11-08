@@ -34,7 +34,7 @@ my2NvEMiVCkO209SP7DesrI -n lwegNercKn81SX8boBDos0ksm0cQpaHm7Nu6qJPmJMk2Kgz25o4gg
 this is a secret\!中文也可以加密
 ````
 
-#详细介绍：
+# 详细介绍：
 ## 背景
 现在大家很熟悉的加解密场景，可以看做A hash成 B，由B可以还原成原来的A
 
