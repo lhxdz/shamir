@@ -12,8 +12,8 @@ type Key struct {
 }
 
 type StrKey struct {
-	X string
-	Y string
+	X string `json:"key_x" yaml:"key_x"`
+	Y string `json:"key_y" yaml:"key_y"`
 }
 
 func EncodeAbleKey(key Key) *StrKey {
