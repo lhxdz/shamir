@@ -11,6 +11,11 @@ type Key struct {
 	Y *big.Int
 }
 
+type CompoundKey struct {
+	X []*big.Int
+	Y []*big.Int
+}
+
 type StrKey struct {
 	X string `json:"key_x" yaml:"key_x"`
 	Y string `json:"key_y" yaml:"key_y"`

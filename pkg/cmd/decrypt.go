@@ -62,8 +62,11 @@ func (d *DecryptCmdConf) RunE(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	secret := shamir.Decrypt(keys, prime)
-	_, err = cmd.OutOrStdout().Write([]byte(code.DecodeSecret(secret) + "\n"))
+	secret, err := shamir.Decrypt(keys, prime)
+	if err != nil {
+		return err
+	}
 
+	_, err = cmd.OutOrStdout().Write([]byte(code.DecodeSecret(secret) + "\n"))
 	return err
 }
