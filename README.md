@@ -29,9 +29,8 @@ this is a secret.同时可以使用中文。
 
 或者：
 ````
-lhx@DESKTOP-0GALLEM:~$ shamir decrypt -x 1ARgxTZ9eRv -x 3uo9qE5tjus -y a7BG2cYFbHFGbcSYe3g90lAyJM6HneKZJqi4U0sY6WAWbUtxVhNbFk -y cWDRLeRNO7swCBis1MkEpWNCC4J4Mbz
-my2NvEMiVCkO209SP7DesrI -n lwegNercKn81SX8boBDos0ksm0cQpaHm7Nu6qJPmJMk2Kgz25o4ggX
-this is a secret\!中文也可以加密
+lhx@DESKTOP-0GALLEM:~$ shamir decrypt -n 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_MV0yI9PnICUSbyxh9iceG0W0HlBn6PDFcfsDDWIHFs3 -x pBE2KvVaYN_569FAGOeEKr,8PXwCwkVb7L_2huJ6o8FBgE -y BVBszEaZArdp0XuVWgxQkDUSr6ylDCgi5t2i7nH4nMEh9ehZeyrPSbs8OnOu_pENXjVJguH45QnxV4k6P5gkxfhm989b23uMqVCd5dWc,uvzHiQfto4zzEJvjhKhCd30XIosCKe2XR3Uh8ULKXULqgA9skmQqlQ0yTWHk_vf0gf0Elij0iedGYRKHrbpTg5CnYvItrt1J9NalREqy
+this is a secret.同时可以使用中文。
 ````
 
 # 详细介绍：
