@@ -86,7 +86,7 @@ func (m *MainCmdConf) initLog() {
 		m.logPath = ""
 	}
 
-	if m.console {
+	if m.console || m.bothLog {
 		opts = append(opts, log.WithConsole())
 	}
 	opts = append(opts, log.WithLogPath(m.logPath))
