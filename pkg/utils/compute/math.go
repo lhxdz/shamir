@@ -1,4 +1,4 @@
-package math
+package compute
 
 import "math"
 
@@ -41,4 +41,18 @@ func XGCD(a, b int64) (int64, int64) {
 	}
 
 	return a, u1 * aNeg
+}
+
+func Min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
+func Max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
 }

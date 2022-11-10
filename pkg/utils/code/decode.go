@@ -2,6 +2,7 @@ package code
 
 import (
 	"math/big"
+	"strings"
 )
 
 const (
@@ -16,6 +17,14 @@ func DecodeSecret(secret *big.Int) string {
 	}
 
 	return string(secret.Bytes())
+}
+
+func DecodeCompoundSecret(secret []*big.Int) string {
+	var b strings.Builder
+	for _, tmpSecret := range secret {
+		b.Write(tmpSecret.Bytes())
+	}
+	return b.String()
 }
 
 // DecodeKey 将加密生成的密钥输出成字符串

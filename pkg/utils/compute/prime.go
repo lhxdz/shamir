@@ -1,11 +1,12 @@
-package math
+package compute
 
 import (
 	"math/big"
 )
 
 const (
-	defaultTestTime = 10
+	defaultTestTime    = 10
+	secretMaxLenNoFast = 200
 )
 
 var (
@@ -134,4 +135,14 @@ func FastPrime(num *big.Int) *big.Int {
 	}
 
 	return NextPrime(num)
+}
+
+// GetSecretMaxLen 返回单个秘密byte最大长度，超过此长度需要再计算素数，此长度后的素数计算时间较久
+func GetSecretMaxLen() int {
+	return len(fastPrimes[len(fastPrimes)-1].Bytes()) - 1
+}
+
+// GetSecretMaxLenNoFast 返回在非快速加密场景下单个秘密byte最大长度，超过此长度需要再计算素数，此长度后的素数计算时间较久
+func GetSecretMaxLenNoFast() int {
+	return secretMaxLenNoFast
 }

@@ -6,12 +6,19 @@ import (
 	"github.com/spf13/cobra"
 
 	"shamir/pkg/utils/code"
+	"shamir/pkg/utils/compute"
 	"shamir/pkg/utils/shamir"
 )
 
 const (
-	stringLimit    = 1024
-	keyNumberLimit = 100
+	// 非流式情况下支持 1MB 数据加密
+	stringLimit    = 1 * compute.UnitM
+	keyNumberLimit = 1000
+)
+
+var (
+	fastSplitLen   = compute.GetSecretMaxLen()
+	noFastSplitLen = compute.GetSecretMaxLenNoFast()
 )
 
 type EncryptCmdConf struct {
@@ -55,14 +62,14 @@ func (e *EncryptCmdConf) RunE(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	secret := code.EncodeSecret(args[0])
-	keys, prime, err := shamir.Encrypt(secret, e.t, e.n, e.fast)
+	secret := code.EncodeCompoundSecret(args[0], getSplitLen(e.fast))
+	keys, prime, err := shamir.HashEncrypt(secret, e.t, e.n, e.fast)
 	if err != nil {
 		return err
 	}
 
 	writer := cmd.OutOrStdout()
-	_, err = writer.Write([]byte(fmt.Sprintf("necessary key: %s\n", code.DecodeKey(prime))))
+	_, err = writer.Write([]byte(fmt.Sprintf("necessary key: %s\n", code.DecodeKeys(prime))))
 	if err != nil {
 		return err
 	}
@@ -73,11 +80,13 @@ func (e *EncryptCmdConf) RunE(cmd *cobra.Command, args []string) error {
 	}
 	data := make([][]string, 0, len(keys))
 	for _, key := range keys {
-		data = append(data, []string{code.DecodeKey(key.X), code.DecodeKey(key.Y)})
+		data = append(data, []string{code.DecodeKeys(key.X), code.DecodeKeys(key.Y)})
 	}
 
-	return RenderData(e.format, header, data, code.EncodeAbleKeys(keys), writer)
+	return RenderData(e.format, header, data, code.EncodeAbleCompoundKeys(keys), writer)
 }
+
+// private
 
 func checkTN(t, n int) error {
 	if t < shamir.MinThreshold {
@@ -93,4 +102,12 @@ func checkTN(t, n int) error {
 	}
 
 	return nil
+}
+
+func getSplitLen(fast bool) int {
+	if fast {
+		return fastSplitLen
+	}
+
+	return noFastSplitLen
 }

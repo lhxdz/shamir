@@ -6,11 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"shamir/pkg/utils/compute"
 )
 
 const (
 	logInfo    = "this is a log info"
-	bufferSize = 1024
+	bufferSize = compute.UnitK
 	tmpLogFile = "/var/log/tmp_shamir_log_test.log"
 )
 

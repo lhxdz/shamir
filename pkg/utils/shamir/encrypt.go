@@ -7,15 +7,15 @@ import (
 	"math/big"
 
 	"shamir/pkg/utils/code"
+	"shamir/pkg/utils/compute"
 	"shamir/pkg/utils/log"
-	math2 "shamir/pkg/utils/math"
 )
 
 const (
 	MinThreshold = 2
 )
 
-var minPrime = math2.NextPrime(big.NewInt(math.MaxInt64))
+var minPrime = compute.NextPrime(big.NewInt(math.MaxInt64))
 
 // Encrypt shamir加密算法，输入秘密secret，门限值threshold，密钥个数keysNumber
 // 返回加密结果密钥对keys，和加密使用的素数，都需谨慎保存
@@ -47,7 +47,7 @@ func HashEncrypt(secret []*big.Int, threshold, keysNumber int, fast bool) (keys 
 		_, err = hash.Write(secret[i].Bytes())
 		if err != nil {
 			log.Errorf("hash check sum failed: %v", err)
-			return nil, nil, HashCheckFailed
+			return nil, nil, HashSumFailed
 		}
 	}
 
@@ -82,29 +82,29 @@ func encrypt(secret *big.Int, threshold, keysNumber int, fast bool) (keys []code
 		prime = new(big.Int).Set(minPrime)
 	} else {
 		if fast {
-			prime = math2.FastPrime(secret)
+			prime = compute.FastPrime(secret)
 		} else {
-			prime = math2.NextPrime(secret)
+			prime = compute.NextPrime(secret)
 		}
 	}
 
 	coefficients := make([]*big.Int, 0, threshold)
 	// secret作为系数a0
 	coefficients = append(coefficients, secret)
-	tmpCoefficients, err := math2.NewRandGenerator(prime).RandIntList(threshold - 1)
+	tmpCoefficients, err := compute.NewRandGenerator(prime).RandIntList(threshold - 1)
 	if err != nil {
 		return nil, nil, err
 	}
 	coefficients = append(coefficients, tmpCoefficients...)
 
-	xKeys, err := math2.NewRandGenerator(minInt(minPrime, prime)).RandIntListNoRepeat(keysNumber)
+	xKeys, err := compute.NewRandGenerator(minInt(minPrime, prime)).RandIntListNoRepeat(keysNumber)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	keys = make([]code.Key, 0, keysNumber)
 	for _, xKey := range xKeys {
-		yKey := compute(coefficients, prime, xKey)
+		yKey := process(coefficients, prime, xKey)
 		keys = append(keys, code.Key{X: xKey, Y: yKey})
 	}
 
@@ -162,7 +162,7 @@ func tnCheck(threshold, keysNumber int) error {
 }
 
 // 计算 f(x) = (a0 + a1*(x^1) + a2*(x^2) + ... an*(x^n)) mod prime
-func compute(coefficients []*big.Int, prime, x *big.Int) *big.Int {
+func process(coefficients []*big.Int, prime, x *big.Int) *big.Int {
 	y := big.NewInt(0)
 	for i, coefficient := range coefficients {
 		// x**i mod prime

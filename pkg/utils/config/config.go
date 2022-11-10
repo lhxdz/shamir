@@ -5,13 +5,13 @@ import (
 
 	"github.com/spf13/viper"
 
+	"shamir/pkg/utils/compute"
 	"shamir/pkg/utils/secure"
 )
 
 const (
-	unitM = 1024 * 1024
 	// 默认最大配置文件大小 20M
-	maxConfigFileSize = 20 * unitM
+	maxConfigFileSize = 20 * compute.UnitM
 
 	configFileName = "shamir.yaml"
 
