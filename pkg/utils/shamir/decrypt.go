@@ -15,7 +15,10 @@ const (
 	negative = -1
 )
 
-var HashCheckFailed = errors.New("secret hash check failed")
+var (
+	HashSumFailed   = errors.New("secret hash sum failed")
+	HashCheckFailed = errors.New("secret hash check failed")
+)
 
 // Decrypt 根据密钥对解密，传入 len(keys) 必须是门限值threshold, prime 也必须是加密时使用的素数。
 // keys要求不能有重复元素，否则panic
@@ -40,7 +43,7 @@ func CompoundDecrypt(keys []code.CompoundKey, prime []*big.Int) (secret []*big.I
 // 若未通过hash校验返回错误
 // 输入的复合key中复合的最后一对key作为hash校验的依据
 func HashDecrypt(keys []code.CompoundKey, prime []*big.Int) (secret []*big.Int, err error) {
-	if err := checkCompoundKeys(keys, prime); err != nil {
+	if err = checkCompoundKeys(keys, prime); err != nil {
 		return nil, err
 	}
 
@@ -55,7 +58,7 @@ func HashDecrypt(keys []code.CompoundKey, prime []*big.Int) (secret []*big.Int, 
 
 	newHash := sha256.New()
 	for i := 0; i < len(secret); i++ {
-		_, err := newHash.Write(secret[i].Bytes())
+		_, err = newHash.Write(secret[i].Bytes())
 		if err != nil {
 			log.Errorf("hash check sum failed: %v", err)
 			return nil, HashCheckFailed

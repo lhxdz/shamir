@@ -49,24 +49,24 @@ func (d *DecryptCmdConf) RunE(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("xKeys and yKeys must be the same counts")
 	}
 
-	prime, ok := code.EncodeKey(d.necessary)
+	prime, ok := code.EncodeKeys(d.necessary)
 	if !ok {
-		return fmt.Errorf("invalid necessary key: %s", d.necessary)
+		return fmt.Errorf("invalid necessary key: %q", d.necessary)
 	}
 	strKeys := make([]*code.StrKey, 0, len(d.xKeys))
 	for i := range d.xKeys {
 		strKeys = append(strKeys, &code.StrKey{X: d.xKeys[i], Y: d.yKeys[i]})
 	}
-	keys, err := code.EncodeStrKeys(strKeys)
+	keys, err := code.EncodeStrCompoundKeys(strKeys)
 	if err != nil {
 		return err
 	}
 
-	secret, err := shamir.Decrypt(keys, prime)
+	secret, err := shamir.HashDecrypt(keys, prime)
 	if err != nil {
 		return err
 	}
 
-	_, err = cmd.OutOrStdout().Write([]byte(code.DecodeSecret(secret) + "\n"))
+	_, err = cmd.OutOrStdout().Write([]byte(code.DecodeCompoundSecret(secret) + "\n"))
 	return err
 }

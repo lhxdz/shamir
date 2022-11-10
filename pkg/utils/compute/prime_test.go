@@ -1,4 +1,4 @@
-package math
+package compute
 
 import (
 	"math/big"
