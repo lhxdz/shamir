@@ -1,8 +1,8 @@
 package code
 
 import (
+	"bytes"
 	"math/big"
-	"strings"
 )
 
 const (
@@ -20,7 +20,11 @@ func DecodeSecret(secret *big.Int) string {
 }
 
 func DecodeCompoundSecret(secret []*big.Int) string {
-	var b strings.Builder
+	if len(secret) == 0 {
+		return ""
+	}
+
+	b := bytes.NewBuffer(make([]byte, 0, len(secret[0].Bytes())*len(secret)))
 	for _, tmpSecret := range secret {
 		b.Write(tmpSecret.Bytes())
 	}
