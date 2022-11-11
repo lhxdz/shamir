@@ -43,7 +43,7 @@ Any t keys can restore the secret.`
 	cmd.Args = ExactArgs(1)
 	// 设置全局flag
 	cmd.Flags().BoolVarP(&conf.fast, "fast", "f", true, "Use exist prime to encrypt secret, it will be fast")
-	cmd.Flags().StringVarP(&conf.output, "output", "o", "", "Output the keys to file")
+	cmd.Flags().StringVarP(&conf.output, "output", "o", "", "Output the keys to path")
 	cmd.Flags().IntVarP(&conf.t, "threshold", "t", 0, "The key's threshold, use t keys can decrypt the secret")
 	cmd.Flags().IntVarP(&conf.n, "number", "n", 0, "The key's number, this secret will encrypt as n keys")
 	cmd.Flags().StringVar(&conf.format, "format", Table, "Output result use [table|yaml|json|csv] "+
