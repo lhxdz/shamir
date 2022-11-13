@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	defaultTestTime    = 10
+	defaultTestTimes   = 10
 	secretMaxLenNoFast = 200
 )
 
@@ -114,7 +114,7 @@ func NextPrime(num *big.Int) *big.Int {
 	result := new(big.Int).Set(num)
 	result.Add(result, incrementalSize)
 
-	for !result.ProbablyPrime(defaultTestTime) {
+	for !result.ProbablyPrime(defaultTestTimes) {
 		result.Add(result, incrementalSize)
 	}
 

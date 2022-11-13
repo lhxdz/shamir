@@ -17,8 +17,9 @@ const (
 )
 
 var (
-	fastSplitLen   = compute.GetSecretMaxLen()
-	noFastSplitLen = compute.GetSecretMaxLenNoFast()
+	// 秘密分隔的大小，应减去额外的前缀开销
+	fastSplitLen   = compute.GetSecretMaxLen() - 1
+	noFastSplitLen = compute.GetSecretMaxLenNoFast() - 1
 )
 
 type EncryptCmdConf struct {

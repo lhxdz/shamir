@@ -12,11 +12,7 @@ const (
 
 // DecodeSecret 将解密后的秘密恢复成字符串
 func DecodeSecret(secret *big.Int) string {
-	if secret == nil {
-		return ""
-	}
-
-	return string(secret.Bytes())
+	return string(getSecretBytes(secret))
 }
 
 func DecodeCompoundSecret(secret []*big.Int) string {
@@ -24,9 +20,9 @@ func DecodeCompoundSecret(secret []*big.Int) string {
 		return ""
 	}
 
-	b := bytes.NewBuffer(make([]byte, 0, len(secret[0].Bytes())*len(secret)))
+	b := bytes.NewBuffer(make([]byte, 0, (len(secret[0].Bytes())-1)*len(secret)))
 	for _, tmpSecret := range secret {
-		b.Write(tmpSecret.Bytes())
+		b.Write(getSecretBytes(tmpSecret))
 	}
 	return b.String()
 }
@@ -51,4 +47,15 @@ func DecodeKeys(keys []*big.Int) string {
 	}
 
 	return result
+}
+
+// private
+
+func getSecretBytes(secret *big.Int) []byte {
+	if secret == nil || len(secret.Bytes()) < 1 {
+		return []byte{}
+	}
+
+	// 去掉0xf前缀
+	return secret.Bytes()[1:]
 }
