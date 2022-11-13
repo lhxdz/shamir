@@ -6,30 +6,30 @@ this is a tool for shamir (k, n) threshold scheme
 输入门限值t、密钥个数n、秘密 即可加密，将会生成一个必须密钥necessary_key、n个密钥(每个密钥包含x、y)，其中任意t个密钥可以恢复秘密
 
 ````
-lhx@DESKTOP-0GALLEM:~$ shamir encrypt -t 2 -n 3 "this is a secret.同时可以使用中文。"
-necessary key: 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_MV0yI9PnICUSbyxh9iceG0W0HlBn6PDFcfsDDWIHFs3
-+-------------------------+-----------------------------------------------------------------------------------------------------------+
-|          KEY X          |                                                   KEY Y                                                   |
-+-------------------------+-----------------------------------------------------------------------------------------------------------+
-| pBE2KvVaYN_569FAGOeEKr  | BVBszEaZArdp0XuVWgxQkDUSr6ylDCgi5t2i7nH4nMEh9ehZeyrPSbs8OnOu_pENXjVJguH45QnxV4k6P5gkxfhm989b23uMqVCd5dWc  |
-+-------------------------+-----------------------------------------------------------------------------------------------------------+
-| 8PXwCwkVb7L_2huJ6o8FBgE | uvzHiQfto4zzEJvjhKhCd30XIosCKe2XR3Uh8ULKXULqgA9skmQqlQ0yTWHk_vf0gf0Elij0iedGYRKHrbpTg5CnYvItrt1J9NalREqy  |
-+-------------------------+-----------------------------------------------------------------------------------------------------------+
-| aWTt0gYv09K_8Id7tS4dstb | 1CvtrfulBa0ObWofpE4ygNK4bQdDWetizrXSXAdWbLTC4T92YAlJpLvFvkMdx_iQcV2Pdrfgb6iCbv9zoBDpXfekqW1f5fVzj7gs3WSCp |
-+-------------------------+-----------------------------------------------------------------------------------------------------------+
+root@DESKTOP-0GALLEM:~/project/shamir-tools# shamir encrypt -t 2 -n 3 "this is a secret.同时可以使用中文。"
+necessary key: 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_41HtWR0abOmnN2ZbElB9ojNixNHGK2ZVIXPpOHs8nffiT
++-------------------------+-------------------------------------------------------------------------------------------------------------+
+|          KEY X          |                                                    KEY Y                                                    |
++-------------------------+-------------------------------------------------------------------------------------------------------------+
+| 26NJWXnvHHD_5NG3WEZJY6c | 1qXaP2vhGW7j7hDFBvdwP5fyMxFUJFZKCNkPHJg5e1XhkM4X6dZaKlGRd4X2F_13CXA5E6TcTMJGZumnJdRrnokzw97X65T2M8HPmHN3oQ3 |
++-------------------------+-------------------------------------------------------------------------------------------------------------+
+| 4jXIgA9Eugh_3RsPU0ttqvx | 4DkyYRocvXq46aZbQt79AHoIvRaSJ5gUuHlv6uh6EvwIn01mtf5GjPdfiRvcP_3LW8yin7eBVHjw7Th5Lo0f9QaUBUsyeLRvUT6sflsmfiq |
++-------------------------+-------------------------------------------------------------------------------------------------------------+
+| 8aLeam8AWrI_3WJ6UTFhDUl | 1aGTxpXJMgfEs6x7scFeK3Al5H1H0Dm13miSdJESP78YcptNVm7G2KmW7tRun_XFOBNvqZnBI43NP5uFw3rnHDpifKQ6ebCd1m5fWTBFEA  |
++-------------------------+-------------------------------------------------------------------------------------------------------------+
 ````
 
 ## 解密：
 分别输入t个密钥x和y，其中第i个x和第i个y是一对密钥，同时输入necessary_key，即可恢复秘密
 
 ````
-lhx@DESKTOP-0GALLEM:~$ shamir decrypt -n 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_MV0yI9PnICUSbyxh9iceG0W0HlBn6PDFcfsDDWIHFs3 -x pBE2KvVaYN_569FAGOeEKr,8PXwCwkVb7L_2huJ6o8FBgE -y BVBszEaZArdp0XuVWgxQkDUSr6ylDCgi5t2i7nH4nMEh9ehZeyrPSbs8OnOu_pENXjVJguH45QnxV4k6P5gkxfhm989b23uMqVCd5dWc,uvzHiQfto4zzEJvjhKhCd30XIosCKe2XR3Uh8ULKXULqgA9skmQqlQ0yTWHk_vf0gf0Elij0iedGYRKHrbpTg5CnYvItrt1J9NalREqy
+lhx@DESKTOP-0GALLEM:~$ shamir decrypt -n 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_41HtWR0abOmnN2ZbElB9ojNixNHGK2ZVIXPpOHs8nffiT -x 26NJWXnvHHD_5NG3WEZJY6c,4jXIgA9Eugh_3RsPU0ttqvx -y 1qXaP2vhGW7j7hDFBvdwP5fyMxFUJFZKCNkPHJg5e1XhkM4X6dZaKlGRd4X2F_13CXA5E6TcTMJGZumnJdRrnokzw97X65T2M8HPmHN3oQ3,4DkyYRocvXq46aZbQt79AHoIvRaSJ5gUuHlv6uh6EvwIn01mtf5GjPdfiRvcP_3LW8yin7eBVHjw7Th5Lo0f9QaUBUsyeLRvUT6sflsmfiq
 this is a secret.同时可以使用中文。
 ````
 
 或者：
 ````
-lhx@DESKTOP-0GALLEM:~$ shamir decrypt -n 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_MV0yI9PnICUSbyxh9iceG0W0HlBn6PDFcfsDDWIHFs3 -x pBE2KvVaYN_569FAGOeEKr -y BVBszEaZArdp0XuVWgxQkDUSr6ylDCgi5t2i7nH4nMEh9ehZeyrPSbs8OnOu_pENXjVJguH45QnxV4k6P5gkxfhm989b23uMqVCd5dWc,uvzHiQfto4zzEJvjhKhCd30XIosCKe2XR3Uh8ULKXULqgA9skmQqlQ0yTWHk_vf0gf0Elij0iedGYRKHrbpTg5CnYvItrt1J9NalREqy  -x 8PXwCwkVb7L_2huJ6o8FBgE
+lhx@DESKTOP-0GALLEM:~$ shamir decrypt -n 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_41HtWR0abOmnN2ZbElB9ojNixNHGK2ZVIXPpOHs8nffiT -x 4jXIgA9Eugh_3RsPU0ttqvx -y 4DkyYRocvXq46aZbQt79AHoIvRaSJ5gUuHlv6uh6EvwIn01mtf5GjPdfiRvcP_3LW8yin7eBVHjw7Th5Lo0f9QaUBUsyeLRvUT6sflsmfiq,1aGTxpXJMgfEs6x7scFeK3Al5H1H0Dm13miSdJESP78YcptNVm7G2KmW7tRun_XFOBNvqZnBI43NP5uFw3rnHDpifKQ6ebCd1m5fWTBFEA  -x 8aLeam8AWrI_3WJ6UTFhDUl
 this is a secret.同时可以使用中文。
 ````
 
