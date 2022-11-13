@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"shamir/pkg/utils/code"
+	"shamir/pkg/utils/compute"
 )
 
 const (
@@ -88,18 +89,11 @@ func (d *decryptEncryptSuit) SetupSuite() {
 	// 大型秘密
 	d.chunkSize = 100
 	for i := 0; i < len(bigSecret); i += d.chunkSize {
-		d.bigSecret = append(d.bigSecret, code.EncodeSecret(bigSecret[i:min(i+d.chunkSize, len(bigSecret))]))
+		d.bigSecret = append(d.bigSecret, code.EncodeSecret(bigSecret[i:compute.Min(i+d.chunkSize, len(bigSecret))]))
 	}
 	bigKeys, bigPrime, err := HashEncrypt(d.bigSecret, d.threshold, d.keysNumber, true)
 	require.NoError(d.T(), err, "get hash encrypt of big secret failed")
 	d.bigKeys, d.bigPrime = bigKeys, bigPrime
-}
-
-func min(x, y int) int {
-	if x < y {
-		return x
-	}
-	return y
 }
 
 func (d *decryptEncryptSuit) TestDecrypt() {

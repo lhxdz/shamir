@@ -7,9 +7,14 @@ import (
 	"shamir/pkg/utils/compute"
 )
 
+const (
+	bytePrefix = 0xff
+)
+
 // EncodeSecret 将字符串秘密编码成为大整数，方便加密
 func EncodeSecret(secret string) *big.Int {
-	return new(big.Int).SetBytes([]byte(secret))
+	// 所有的秘密都加上 0xff前缀, 避免全零数据丢失真实数据
+	return new(big.Int).SetBytes(append([]byte{bytePrefix}, secret...))
 }
 
 func EncodeCompoundSecret(secret string, splitLen int) []*big.Int {
