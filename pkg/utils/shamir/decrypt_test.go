@@ -66,7 +66,6 @@ type decryptEncryptSuit struct {
 	suite.Suite
 
 	threshold, keysNumber int
-	chunkSize             int
 
 	secret *big.Int
 	keys   []code.Key
@@ -87,10 +86,7 @@ func (d *decryptEncryptSuit) SetupSuite() {
 	d.keys, d.prime = keys, prime
 
 	// 大型秘密
-	d.chunkSize = 100
-	for i := 0; i < len(bigSecret); i += d.chunkSize {
-		d.bigSecret = append(d.bigSecret, code.EncodeSecret(bigSecret[i:compute.Min(i+d.chunkSize, len(bigSecret))]))
-	}
+	d.bigSecret = code.EncodeCompoundSecret(bigSecret, compute.GetSecretMaxLen()-1)
 	bigKeys, bigPrime, err := HashEncrypt(d.bigSecret, d.threshold, d.keysNumber, true)
 	require.NoError(d.T(), err, "get hash encrypt of big secret failed")
 	d.bigKeys, d.bigPrime = bigKeys, bigPrime
