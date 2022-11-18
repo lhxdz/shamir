@@ -2,6 +2,16 @@
 this is a tool for shamir (k, n) threshold scheme
 
 # 使用方式
+快速安装：
+
+````
+git clone https://github.com/lhxdz/shamir.git
+cd shamir
+make install
+````
+
+使用 `shamir --version` 来验证
+
 ## 加密：
 输入门限值t、密钥个数n、秘密 即可加密，将会生成一个必须密钥necessary_key、n个密钥(每个密钥包含x、y)，其中任意t个密钥可以恢复秘密
 
