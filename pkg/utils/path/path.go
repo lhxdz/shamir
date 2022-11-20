@@ -2,7 +2,6 @@ package path
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,7 +37,7 @@ func IsDir(path string) bool {
 // GetAllKeyFile 获取指定目录下所有的shamir key的文件路径
 func GetAllKeyFile(path string) ([]string, error) {
 	path = filepath.Clean(path)
-	rd, err := ioutil.ReadDir(path)
+	rd, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println("read dir fail:", err)
 		return nil, err
@@ -46,10 +45,11 @@ func GetAllKeyFile(path string) ([]string, error) {
 
 	result := make([]string, 0)
 	for _, fi := range rd {
-		if fi.IsDir() || !strings.HasPrefix(filepath.Base(fi.Name()), KeyFilePrefix) {
+		name := filepath.Base(fi.Name())
+		if fi.IsDir() || !strings.HasPrefix(name, KeyFilePrefix) {
 			continue
 		}
-		result = append(result, filepath.Join(path, filepath.Base(fi.Name())))
+		result = append(result, filepath.Join(path, name))
 	}
 	return result, nil
 }
@@ -58,4 +58,20 @@ func GetAllKeyFile(path string) ([]string, error) {
 func IsNecessaryKeyExist(path string) bool {
 	path = filepath.Join(filepath.Clean(path), NecessaryFileName)
 	return IsExist(path)
+}
+
+func CheckNoKey(path string) error {
+	files, err := GetAllKeyFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	if len(files) != 0 {
+		return fmt.Errorf("key files exist: %s", strings.Join(files, ","))
+	}
+
+	return nil
 }
