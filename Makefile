@@ -24,6 +24,7 @@ _install:
 	chmod 755 ${INSTALL_DIR}/${NAME}
 	mkdir -p ${CONFIG_DIR}
 	cp -f ./${OUTPUT}/conf/* ${CONFIG_DIR}/.
+	@echo "Install shamir success!"
 
 uninstall:
 	@echo "uninstalling shamir..."
