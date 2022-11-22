@@ -128,9 +128,9 @@ func (s *KeyEncoder) Read() (*big.Int, bool, error) {
 		data = data[:len(data)-1]
 	}
 
-	result, err := encodeKey(data)
-	if err != nil {
-		return nil, errors.Is(err, io.EOF), err
+	result, e := encodeKey(data)
+	if e != nil {
+		return nil, errors.Is(err, io.EOF), e
 	}
 
 	return result, errors.Is(err, io.EOF), nil

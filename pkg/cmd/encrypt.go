@@ -22,8 +22,6 @@ const (
 	stringLimit           = 1 * compute.UnitM
 	keyNumberLimit        = 1000
 	defaultFilePermission = 0644
-	xKeyFilePrefix        = path.KeyFilePrefix + "x-key_"
-	yKeyFilePrefix        = path.KeyFilePrefix + "y-key_"
 )
 
 var (
@@ -33,9 +31,9 @@ var (
 )
 
 type EncryptCmdConf struct {
-	fast          bool
-	output, input string
-	t, n          int
+	fast              bool
+	outputPath, input string
+	t, n              int
 
 	format string
 }
@@ -57,7 +55,7 @@ shamir encrypt -n 2 -t 2 "this is a secret.同时支持中文"
 `
 	// 设置全局flag
 	cmd.Flags().BoolVarP(&conf.fast, "fast", "f", true, "Use exist prime to encrypt secret, it will be fast")
-	cmd.Flags().StringVarP(&conf.output, "output", "o", "", "Output the keys to path")
+	cmd.Flags().StringVarP(&conf.outputPath, "output-path", "o", "", "Output the keys to path")
 	cmd.Flags().StringVarP(&conf.input, "input", "i", "", "Read secret from file, if set input file, "+
 		"get secret from file first. (must use with -o)")
 	cmd.Flags().IntVarP(&conf.t, "threshold", "t", 0, "The key's threshold, use t keys can decrypt the secret")
@@ -106,7 +104,7 @@ func (enc *EncryptCmdConf) RunE(cmd *cobra.Command, args []string) error {
 			break
 		}
 	}
-	if enc.output != "" {
+	if enc.outputPath != "" {
 		taskIndicator.Success()
 		return nil
 	}
@@ -158,8 +156,12 @@ func (enc *EncryptCmdConf) check(cmd *cobra.Command, args []string) error {
 		if len(args[0]) > stringLimit {
 			return fmt.Errorf("invalid string, secret length should be less than %dMB, encrypt big secret please use -i", stringLimit/compute.UnitM)
 		}
-	} else if enc.output == "" {
+	} else if enc.outputPath == "" {
 		return fmt.Errorf("please use -o, when input secret whitout terminal arguments")
+	}
+
+	if enc.input != "" && !path.IsExist(enc.input) {
+		return fmt.Errorf("invalid input file path %q, not exist", enc.input)
 	}
 
 	if err := checkTN(enc.t, enc.n); err != nil {
@@ -205,10 +207,7 @@ func (enc *EncryptCmdConf) getInput(cmd *cobra.Command, args []string) (io.ReadC
 		return input, nil
 	}
 
-	if !path.IsExist(enc.input) {
-		return nil, fmt.Errorf("invalid input file path %q, not exist", enc.input)
-	}
-
+	enc.input = filepath.Clean(enc.input)
 	input, err := os.OpenFile(enc.input, os.O_RDONLY, 0)
 	if err != nil {
 		return nil, fmt.Errorf("open input secret file failed: %w", err)
@@ -220,23 +219,24 @@ func (enc *EncryptCmdConf) getInput(cmd *cobra.Command, args []string) (io.ReadC
 func (enc *EncryptCmdConf) getOutput() ([]*keyReadWriter, io.ReadWriter, *TaskIndicator, error) {
 	var keys = make([]*keyReadWriter, 0, enc.n)
 	var necessary io.ReadWriteCloser
-	if enc.output == "" {
-		necessary = NewBuffer(bytes.NewBuffer([]byte{}))
+	if enc.outputPath == "" {
+		necessary = NewReadWriteCloser(bytes.NewBuffer([]byte{}))
 
 		for i := 0; i < enc.n; i++ {
-			keys = append(keys, NewKeyReadWriter(NewBuffer(bytes.NewBuffer([]byte{})), NewBuffer(bytes.NewBuffer([]byte{}))))
+			keys = append(keys, NewKeyReadWriter(NewReadWriteCloser(bytes.NewBuffer([]byte{})),
+				NewReadWriteCloser(bytes.NewBuffer([]byte{}))))
 		}
 		return keys, necessary, NewTaskIndicator(nil, nil), nil
 	}
 
 	// 输出到指定文件夹下
-	enc.output = filepath.Clean(enc.output)
-	err := os.MkdirAll(enc.output, 0750)
+	enc.outputPath = filepath.Clean(enc.outputPath)
+	err := os.MkdirAll(enc.outputPath, 0750)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	err = path.CheckNoKey(enc.output)
+	err = path.CheckNoKey(enc.outputPath)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -244,31 +244,31 @@ func (enc *EncryptCmdConf) getOutput() ([]*keyReadWriter, io.ReadWriter, *TaskIn
 	var opened []io.Closer
 	var paths []string
 	for i := 0; i < enc.n; i++ {
-		xKeyFileName := filepath.Join(enc.output, getXKeyFileName(i))
+		xKeyFileName := filepath.Join(enc.outputPath, getXKeyFileName(i))
 		xKeyFile, err := os.OpenFile(xKeyFileName, os.O_CREATE|os.O_WRONLY, defaultFilePermission)
 		if err != nil {
 			rollback(opened, paths)
-			return nil, nil, nil, fmt.Errorf("create file %s failed: %w", xKeyFileName, err)
+			return nil, nil, nil, fmt.Errorf("create x key file %s failed: %w", xKeyFileName, err)
 		}
 		opened = append(opened, xKeyFile)
 		paths = append(paths, xKeyFileName)
 
-		yKeyFileName := filepath.Join(enc.output, getYKeyFileName(i))
+		yKeyFileName := filepath.Join(enc.outputPath, getYKeyFileName(i))
 		yKeyFile, err := os.OpenFile(yKeyFileName, os.O_CREATE|os.O_WRONLY, defaultFilePermission)
 		if err != nil {
 			rollback(opened, paths)
-			return nil, nil, nil, fmt.Errorf("create file %s failed: %w", xKeyFileName, err)
+			return nil, nil, nil, fmt.Errorf("create y key file %s failed: %w", xKeyFileName, err)
 		}
 		opened = append(opened, yKeyFile)
 		paths = append(paths, yKeyFileName)
 		keys = append(keys, NewKeyReadWriter(xKeyFile, yKeyFile))
 	}
 
-	necessaryKeyFileName := filepath.Join(enc.output, path.NecessaryFileName)
+	necessaryKeyFileName := filepath.Join(enc.outputPath, path.NecessaryFileName)
 	necessary, err = os.OpenFile(necessaryKeyFileName, os.O_CREATE|os.O_WRONLY, defaultFilePermission)
 	if err != nil {
 		rollback(opened, paths)
-		return nil, nil, nil, fmt.Errorf("create file %s failed: %w", necessaryKeyFileName, err)
+		return nil, nil, nil, fmt.Errorf("create necessary key file %s failed: %w", necessaryKeyFileName, err)
 	}
 	opened = append(opened, necessary)
 	paths = append(paths, necessaryKeyFileName)
@@ -277,10 +277,10 @@ func (enc *EncryptCmdConf) getOutput() ([]*keyReadWriter, io.ReadWriter, *TaskIn
 }
 
 func getXKeyFileName(id int) string {
-	return fmt.Sprintf("%s%d", xKeyFilePrefix, id)
+	return fmt.Sprintf("%s%d", path.XKeyFilePrefix, id)
 }
 func getYKeyFileName(id int) string {
-	return fmt.Sprintf("%s%d", yKeyFilePrefix, id)
+	return fmt.Sprintf("%s%d", path.YKeyFilePrefix, id)
 }
 
 func rollback(opened []io.Closer, paths []string) {
