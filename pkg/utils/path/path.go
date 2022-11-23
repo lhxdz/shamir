@@ -10,6 +10,8 @@ import (
 const (
 	KeyFilePrefix     = "shamir_"
 	NecessaryFileName = KeyFilePrefix + "necessary-key"
+	XKeyFilePrefix    = KeyFilePrefix + "x-key_"
+	YKeyFilePrefix    = KeyFilePrefix + "y-key_"
 )
 
 // IsExist 返回路径是否存在
@@ -39,8 +41,7 @@ func GetAllKeyFile(path string) ([]string, error) {
 	path = filepath.Clean(path)
 	rd, err := os.ReadDir(path)
 	if err != nil {
-		fmt.Println("read dir fail:", err)
-		return nil, err
+		return nil, fmt.Errorf("read dir fail: %w", err)
 	}
 
 	result := make([]string, 0)
@@ -74,4 +75,53 @@ func CheckNoKey(path string) error {
 	}
 
 	return nil
+}
+
+type KeyName struct {
+	XKey string
+	YKey string
+}
+
+// GetKeysName 从指定目录获取存在的密钥对的文件名，和必须密钥的文件名
+func GetKeysName(path string) ([]*KeyName, string, error) {
+	path = filepath.Clean(path)
+	if !IsExist(path) {
+		return nil, "", fmt.Errorf("path %q not exist", path)
+	}
+
+	if !IsNecessaryKeyExist(path) {
+		return nil, "", fmt.Errorf("necessary key not exist")
+	}
+
+	names, err := GetAllKeyFile(path)
+	if err != nil {
+		return nil, "", err
+	}
+	namesMap := make(map[string]struct{}, len(names))
+	for _, file := range names {
+		namesMap[file] = struct{}{}
+	}
+
+	// 找到文件夹中的密钥对，密钥对的前缀分别是x和y相关前缀，后缀一致
+	var keys []*KeyName
+	for file := range namesMap {
+		if !strings.HasPrefix(file, XKeyFilePrefix) {
+			continue
+		}
+
+		suffix := strings.TrimPrefix(file, XKeyFilePrefix)
+		if _, ok := namesMap[YKeyFilePrefix+suffix]; !ok {
+			continue
+		}
+		keys = append(keys, &KeyName{
+			XKey: XKeyFilePrefix + suffix,
+			YKey: YKeyFilePrefix + suffix,
+		})
+	}
+
+	if len(keys) == 0 {
+		return nil, "", fmt.Errorf("path %q can not found key", path)
+	}
+
+	return keys, NecessaryFileName, nil
 }

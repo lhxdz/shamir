@@ -7,6 +7,8 @@ import (
 	"hash"
 	"io"
 	"math/big"
+
+	"shamir/pkg/utils/log"
 )
 
 const (
@@ -55,9 +57,9 @@ func DecodeKeys(keys []*big.Int) string {
 
 type SecretDecoder struct {
 	// 用于记录最后一次传入的数据，因为最后一个是hash校验值
-	lastData []byte
-	hash     hash.Hash
-	writer   io.Writer
+	last   *big.Int
+	hash   hash.Hash
+	writer io.Writer
 }
 
 func NewSecretDecoder(writer io.Writer) *SecretDecoder {
@@ -75,23 +77,24 @@ func (s *SecretDecoder) Write(data *big.Int) error {
 	}
 
 	// 每次写上次的数据，防止将最后一个hash校验的数据误写入
-	if s.lastData != nil {
-		n, err := s.writer.Write(s.lastData)
+	if s.last != nil {
+		writeData := getSecretBytes(s.last)
+		n, err := s.writer.Write(writeData)
 		if err != nil {
 			return fmt.Errorf("write data failed: %w", err)
 		}
-		if n != len(s.lastData) {
-			return fmt.Errorf("write data failed, expected write %d bytes, actual %d bytes", len(s.lastData), n)
+		if n != len(writeData) {
+			return fmt.Errorf("write data failed, expected write %d bytes, actual %d bytes", len(writeData), n)
 		}
 	}
 
 	// 将这次传入的数据保存
-	s.lastData = getSecretBytes(data)
+	s.last = data
 	return nil
 }
 
 func (s *SecretDecoder) HashCheck() error {
-	expectedHash := string(s.lastData)
+	expectedHash := string(s.last.Bytes())
 	actuallyHash := string(s.hash.Sum(nil))
 	if expectedHash != actuallyHash {
 		return fmt.Errorf("expected hash %s, actual hash %s", expectedHash, actuallyHash)
@@ -135,6 +138,7 @@ func (k *KeyDecoder) Write(key *big.Int) error {
 
 func getSecretBytes(secret *big.Int) []byte {
 	if secret == nil || len(secret.Bytes()) < 1 {
+		log.Errorf("secret bytes empty")
 		return []byte{}
 	}
 

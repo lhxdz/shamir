@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -83,17 +82,31 @@ func ExactArgs(n int) cobra.PositionalArgs {
 	}
 }
 
-type bufferReadWriteClose struct {
-	*bytes.Buffer
+type myReadWriteCloser struct {
+	io.ReadWriter
 }
 
-func (b *bufferReadWriteClose) Close() error {
+func (b *myReadWriteCloser) Close() error {
 	return nil
 }
 
-func NewBuffer(b *bytes.Buffer) *bufferReadWriteClose {
-	return &bufferReadWriteClose{
-		Buffer: b,
+func NewReadWriteCloser(rw io.ReadWriter) *myReadWriteCloser {
+	return &myReadWriteCloser{
+		ReadWriter: rw,
+	}
+}
+
+type myWriteCloser struct {
+	io.Writer
+}
+
+func (m *myWriteCloser) Close() error {
+	return nil
+}
+
+func NewWriteCloser(w io.Writer) *myWriteCloser {
+	return &myWriteCloser{
+		Writer: w,
 	}
 }
 
@@ -113,6 +126,13 @@ func (k *keyReadWriter) ToXYKeyDecoder() *xyKeyDecoder {
 	return &xyKeyDecoder{
 		x: code.NewKeyDecoder(k.x),
 		y: code.NewKeyDecoder(k.y),
+	}
+}
+
+func (k *keyReadWriter) ToXYKeyEncoder() *xyKeyEncoder {
+	return &xyKeyEncoder{
+		x: code.NewKeyEncoder(k.x),
+		y: code.NewKeyEncoder(k.y),
 	}
 }
 
@@ -151,6 +171,31 @@ func (xy *xyKeyDecoder) decoder(key *code.Key) error {
 		return err
 	}
 	return nil
+}
+
+type xyKeyEncoder struct {
+	x *code.KeyEncoder
+	y *code.KeyEncoder
+}
+
+func (xy *xyKeyEncoder) encoder() (code.Key, bool, error) {
+	key := code.Key{}
+	x, xOk, xErr := xy.x.Read()
+	y, yOk, yErr := xy.y.Read()
+	if xErr != nil || yErr != nil {
+		if xErr != nil {
+			return key, false, fmt.Errorf("read x key failed: %w", xErr)
+		} else {
+			return key, false, fmt.Errorf("read y key failed: %w", yErr)
+		}
+	}
+
+	if xOk != yOk {
+		return key, false, fmt.Errorf("x key not match y key")
+	}
+
+	key.X, key.Y = x, y
+	return key, xOk, nil
 }
 
 // TaskIndicator 任务指示器，使用 Fail 执行任务失败的函数，使用 Success 执行任务成功的函数，并将失败方法置nil
