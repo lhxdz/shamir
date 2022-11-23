@@ -38,6 +38,7 @@ The insertion order of x、y must be the same, and they must be the counts, xKey
 `
 	cmd.Example = `shamir decrypt -n 123456789 -x 455 -y 455 -x 666 -y 666
 shamir decrypt -i ./ -t 2
+shamir decrypt -i ./keys/ -t 2 -o ./secret.txt
 `
 	cmd.Args = NoArgs
 	// 设置全局flag
