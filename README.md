@@ -12,7 +12,7 @@ make install
 
 使用 `shamir --version` 来验证
 
-## 加密：
+## 加密：支持加密命令行输入字符串、加密指定文件
 输入门限值t、密钥个数n、秘密 即可加密，将会生成一个必须密钥necessary_key、n个密钥(每个密钥包含x、y)，其中任意t个密钥可以恢复秘密
 
 ````
@@ -29,7 +29,7 @@ necessary key: 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_41H
 +-------------------------+-------------------------------------------------------------------------------------------------------------+
 ````
 
-## 解密：
+## 解密：支持从命令行获取密钥解密、从指定文件夹读取密钥文件解密
 分别输入t个密钥x和y，其中第i个x和第i个y是一对密钥，同时输入necessary_key，即可恢复秘密
 
 ````
@@ -42,6 +42,8 @@ this is a secret.同时可以使用中文。
 lhx@DESKTOP-0GALLEM:~$ shamir decrypt -n 6IznUBFJvXlEgv1jFCGH4OsE4zPmhPVcHvcyrzVXPOMjCuu1gZxZgbq1CAWmd_41HtWR0abOmnN2ZbElB9ojNixNHGK2ZVIXPpOHs8nffiT -x 4jXIgA9Eugh_3RsPU0ttqvx -y 4DkyYRocvXq46aZbQt79AHoIvRaSJ5gUuHlv6uh6EvwIn01mtf5GjPdfiRvcP_3LW8yin7eBVHjw7Th5Lo0f9QaUBUsyeLRvUT6sflsmfiq,1aGTxpXJMgfEs6x7scFeK3Al5H1H0Dm13miSdJESP78YcptNVm7G2KmW7tRun_XFOBNvqZnBI43NP5uFw3rnHDpifKQ6ebCd1m5fWTBFEA  -x 8aLeam8AWrI_3WJ6UTFhDUl
 this is a secret.同时可以使用中文。
 ````
+
+**更多使用方式，请使用 `shamir --help`**
 
 # 详细介绍：
 ## 背景
